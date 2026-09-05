@@ -13,12 +13,15 @@ public class Employee extends Person {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String employeeNumber;
     private String department;
     private String designation;
     private Double salary;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+    public String getEmployeeNumber() { return employeeNumber; }
+    public void setEmployeeNumber(String employeeNumber) { this.employeeNumber = employeeNumber; }
     public String getDepartment() { return department; }
     public void setDepartment(String department) { this.department = department; }
     public String getDesignation() { return designation; }
