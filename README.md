@@ -1,78 +1,121 @@
-# Student & Employee Test Project
+# Student Employee Project
 
-A Spring Boot Java 21 project intentionally designed to test source-code analysis tools.
+A Spring Boot Java 21 test application designed for code-analysis / CodeIntelligence testing.
 
-## Included constructs
-- REST controllers
-- Controller interface mappings
-- Generic base controller interface
-- Service interfaces
-- Service implementations
-- Abstract generic service class
-- JPA repositories
-- Entities with inheritance from an abstract `Person`
-- DTO records + validation
-- Global exception handler
-- H2 database
-- GET, POST, PUT, PATCH and DELETE endpoints
-- Repository calls both through services and directly from a controller
+It intentionally contains controller interfaces, inherited controller methods, abstract service methods,
+service interfaces and implementations, JPA repositories, entities, DTOs, validation and exception handling.
 
-## Run
+## Stack
+
+- Java 21
+- Spring Boot 3.5.5
+- Gradle
+- Spring Web
+- Spring Data JPA
+- PostgreSQL
+- Jakarta Validation
+
+## Start PostgreSQL
+
+The easiest local option is Docker:
+
 ```bash
-mvn spring-boot:run
+docker compose up -d
 ```
 
-Open H2 console: `http://localhost:8080/h2-console`
-JDBC URL: `jdbc:h2:mem:studentemployee`
+This starts PostgreSQL with:
 
-## Important endpoints
+- Database: `student_employee_db`
+- Username: `postgres`
+- Password: `postgres`
+- Port: `5432`
 
-### Students
-- GET `/api/students`
-- GET `/api/students/{id}`
-- GET `/api/students/course/{course}`
-- POST `/api/students`
-- PUT `/api/students/{id}`
-- DELETE `/api/students/{id}`
+## Run the application
 
-### Employees
-- GET `/api/employees`
-- GET `/api/employees/{id}`
-- GET `/api/employees/department/{department}`
-- POST `/api/employees`
-- PATCH `/api/employees/{id}`
-- DELETE `/api/employees/{id}`
+If Gradle is installed:
 
-### Cross-entity search
-- GET `/api/search/person?email=...`
-
-## Example student JSON
-```json
-{
-  "name": "Ravi Kumar",
-  "email": "ravi@student.com",
-  "age": 21,
-  "course": "Computer Science",
-  "yearOfStudy": 3,
-  "gpa": 8.7
-}
+```bash
+gradle bootRun
 ```
 
-## Example employee JSON
-```json
-{
-  "name": "Anita Sharma",
-  "email": "anita@company.com",
-  "age": 31,
-  "department": "Engineering",
-  "designation": "Senior Developer",
-  "salary": 1200000
-}
+If you generate/use the Gradle wrapper:
+
+Windows:
+
+```bash
+gradlew.bat bootRun
 ```
 
-## CodeIntelligence test cases
-1. `/api/students/{id}` GET mapping is declared in `BaseReadController`, but implemented in `StudentController`.
-2. `/api/students` class-level mapping is declared in `StudentApi`, not directly on `StudentController`.
-3. Student flow: controller -> `StudentService` interface -> `StudentServiceImpl` -> abstract inherited method -> `StudentRepository` -> `Student` entity.
-4. Employee mappings are intentionally mixed between `EmployeeApi` and `EmployeeController`.
-5. `SearchController` directly calls repositories, which gives your analyzer a non-standard controller -> repository path.
+Linux/macOS:
+
+```bash
+./gradlew bootRun
+```
+
+The API starts at:
+
+`http://localhost:8080`
+
+## PostgreSQL configuration
+
+Defaults are in `src/main/resources/application.properties`:
+
+```properties
+spring.datasource.url=${DB_URL:jdbc:postgresql://localhost:5432/student_employee_db}
+spring.datasource.username=${DB_USERNAME:postgres}
+spring.datasource.password=${DB_PASSWORD:postgres}
+```
+
+For another environment, set:
+
+```text
+DB_URL
+DB_USERNAME
+DB_PASSWORD
+```
+
+For example:
+
+```text
+DB_URL=jdbc:postgresql://localhost:5432/student_employee_db
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+```
+
+## Main code-analysis paths
+
+### Inherited controller mapping
+
+```text
+GET /api/students/{id}
+  -> BaseReadController
+  -> StudentController
+  -> StudentService
+  -> StudentServiceImpl
+  -> AbstractPersonService
+  -> StudentRepository
+  -> PostgreSQL
+```
+
+### Interface-declared controller mapping
+
+```text
+POST /api/students
+  -> StudentApi
+  -> StudentController
+  -> StudentService
+  -> StudentServiceImpl
+  -> StudentRepository
+  -> PostgreSQL
+```
+
+### Multi-repository flow
+
+```text
+GET /api/search/person?email=...
+  -> SearchController
+  -> StudentRepository / EmployeeRepository
+  -> PostgreSQL
+```
+
+This makes the project useful for testing whether an analyzer discovers endpoint mappings across the entire Java project instead of looking only at concrete controller classes.
