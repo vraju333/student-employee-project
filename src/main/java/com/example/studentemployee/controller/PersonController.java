@@ -1,55 +1,15 @@
 package com.example.studentemployee.controller;
 
-import com.example.studentemployee.dto.person.*;
-import com.example.studentemployee.enums.PersonType;
-import com.example.studentemployee.service.PersonManagementService;
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-
-@RestController
-@RequestMapping("/api/persons")
+import com.example.studentemployee.dto.request.*; import com.example.studentemployee.dto.response.PersonResponse; import com.example.studentemployee.enums.PersonType; import com.example.studentemployee.service.PersonService; import jakarta.validation.Valid; import org.springframework.http.*; import org.springframework.web.bind.annotation.*;
+@RestController @RequestMapping("/api/persons")
 public class PersonController {
-    private final PersonManagementService personService;
-
-    public PersonController(PersonManagementService personService) {
-        this.personService = personService;
-    }
-
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public PersonResponse create(@Valid @RequestBody PersonCreateRequest request) {
-        return personService.create(request);
-    }
-
-    @PutMapping("/{id}")
-    public PersonResponse update(@PathVariable Long id, @Valid @RequestBody PersonUpdateRequest request) {
-        return personService.update(id, request);
-    }
-
-    @PatchMapping("/{id}")
-    public PersonResponse patch(@PathVariable Long id, @Valid @RequestBody PersonPatchRequest request) {
-        return personService.patch(id, request);
-    }
-
-    @PatchMapping("/{id}/email")
-    public PersonResponse updateEmail(@PathVariable Long id, @Valid @RequestBody EmailUpdateRequest request) {
-        return personService.updateEmail(id, request);
-    }
-
-    @PatchMapping("/{id}/contact")
-    public PersonResponse updateContact(@PathVariable Long id, @Valid @RequestBody ContactUpdateRequest request) {
-        return personService.updateContact(id, request);
-    }
-
-    @GetMapping("/{id}")
-    public PersonResponse get(@PathVariable Long id, @RequestParam PersonType type) {
-        return personService.get(id, type);
-    }
-
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id, @RequestParam PersonType type) {
-        personService.delete(id, type);
-    }
+ private final PersonService service; public PersonController(PersonService s){service=s;}
+ @PostMapping @ResponseStatus(HttpStatus.CREATED) public PersonResponse create(@Valid @RequestBody PersonRequest r){return service.create(r);}
+ @PutMapping("/{id}") public PersonResponse update(@PathVariable Long id,@Valid @RequestBody PersonRequest r){return service.update(id,r);}
+ @PatchMapping("/{id}") public PersonResponse patch(@PathVariable Long id,@RequestBody PersonPatchRequest r){return service.patch(id,r);}
+ @PatchMapping("/{id}/email") public PersonResponse updateEmail(@PathVariable Long id,@RequestBody EmailUpdateRequest r){return service.updateEmail(id,r);}
+ @PatchMapping("/{id}/address") public PersonResponse updateAddress(@PathVariable Long id,@RequestBody AddressUpdateRequest r){return service.updateAddress(id,r);}
+ @PatchMapping("/{id}/contact") public PersonResponse updateContact(@PathVariable Long id,@RequestBody ContactUpdateRequest r){return service.updateContact(id,r);}
+ @GetMapping("/{id}") public PersonResponse get(@PathVariable Long id,@RequestParam PersonType type){return service.get(id,type);}
+ @DeleteMapping("/{id}") @ResponseStatus(HttpStatus.NO_CONTENT) public void delete(@PathVariable Long id,@RequestParam PersonType type){service.delete(id,type);}
 }

@@ -1,66 +1,15 @@
 package com.example.studentemployee.service.impl;
 
-import com.example.studentemployee.dto.EmployeeRequest;
-import com.example.studentemployee.entity.Employee;
-import com.example.studentemployee.exception.ResourceNotFoundException;
-import com.example.studentemployee.repository.EmployeeRepository;
-import com.example.studentemployee.service.EmployeeService;
-import com.example.studentemployee.service.base.AbstractPersonService;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-
-@Service
-public class EmployeeServiceImpl extends AbstractPersonService<Employee, EmployeeRequest> implements EmployeeService {
-    private final EmployeeRepository employeeRepository;
-
-    public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
-        this.employeeRepository = employeeRepository;
-    }
-
-    @Override
-    public Employee createEmployee(EmployeeRequest request) { return create(request); }
-    @Override
-    public Employee getEmployee(Long id) { return getById(id); }
-    @Override
-    public List<Employee> getEmployees() { return getAll(); }
-    @Override
-    public List<Employee> getEmployeesByDepartment(String department) {
-        return employeeRepository.findByDepartmentIgnoreCase(normalize(department));
-    }
-    @Override
-    public Employee updateEmployee(Long id, EmployeeRequest request) { return update(id, request); }
-    @Override
-    public void deleteEmployee(Long id) { delete(id); }
-
-    @Override
-    public Employee create(EmployeeRequest request) {
-        Employee employee = new Employee();
-        apply(employee, request);
-        return employeeRepository.save(employee);
-    }
-    @Override
-    public Employee getById(Long id) {
-        return employeeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Employee not found: " + id));
-    }
-    @Override
-    public List<Employee> getAll() { return employeeRepository.findAll(); }
-    @Override
-    public Employee update(Long id, EmployeeRequest request) {
-        Employee employee = getById(id);
-        apply(employee, request);
-        return employeeRepository.save(employee);
-    }
-    @Override
-    public void delete(Long id) { employeeRepository.delete(getById(id)); }
-
-    private void apply(Employee employee, EmployeeRequest request) {
-        employee.setName(normalize(request.name()));
-        employee.setEmail(normalize(request.email()));
-        employee.setAge(request.age());
-        employee.setDepartment(normalize(request.department()));
-        employee.setDesignation(normalize(request.designation()));
-        employee.setSalary(request.salary());
-    }
+import com.example.studentemployee.dto.request.*; import com.example.studentemployee.dto.response.PersonResponse; import com.example.studentemployee.entity.*; import com.example.studentemployee.enums.PersonType; import com.example.studentemployee.exception.PersonNotFoundException; import com.example.studentemployee.mapper.*; import com.example.studentemployee.repository.EmployeeRepository; import com.example.studentemployee.service.EmployeeService; import com.example.studentemployee.service.base.AbstractPersonService; import org.springframework.stereotype.Service;
+@Service public class EmployeeServiceImpl extends AbstractPersonService<Employee> implements EmployeeService {
+ private final EmployeeRepository repo; private final EmployeeMapper mapper; private final EmailDetailsMapper emailMapper; private final AddressMapper addressMapper; private final ContactDetailsMapper contactMapper;
+ public EmployeeServiceImpl(EmployeeRepository r,EmployeeMapper m,EmailDetailsMapper e,AddressMapper a,ContactDetailsMapper c){repo=r;mapper=m;emailMapper=e;addressMapper=a;contactMapper=c;}
+ protected Employee findEntity(Long id){return repo.findById(id).orElseThrow(()->new PersonNotFoundException("Employee not found: "+id));}
+ public PersonResponse create(PersonRequest r){return mapper.toResponse(repo.save(mapper.toEntity(r)));}
+ public PersonResponse update(Long id,PersonRequest r){Employee e=findEntity(id);mapper.update(r,e);return mapper.toResponse(repo.save(e));}
+ public PersonResponse patch(Long id,PersonPatchRequest r){Employee e=findEntity(id);if(r.department()!=null)e.setDepartment(r.department());if(r.designation()!=null)e.setDesignation(r.designation());if(r.salary()!=null)e.setSalary(r.salary());return mapper.toResponse(repo.save(e));}
+ public PersonResponse updateEmail(Long id,EmailUpdateRequest r){Employee e=findEntity(id);EmailDetails d=e.getEmailDetails()==null?new EmailDetails():e.getEmailDetails();emailMapper.apply(new EmailDetailsRequest(r.primaryEmail(),r.secondaryEmail()),d);e.setEmailDetails(d);return mapper.toResponse(repo.save(e));}
+ public PersonResponse updateAddress(Long id,AddressUpdateRequest r){Employee e=findEntity(id);Address a=e.getAddress()==null?new Address():e.getAddress();addressMapper.apply(new AddressRequest(r.line1(),r.line2(),r.city(),r.state(),r.postalCode()),a);e.setAddress(a);return mapper.toResponse(repo.save(e));}
+ public PersonResponse updateContact(Long id,ContactUpdateRequest r){Employee e=findEntity(id);ContactDetails c=e.getContactDetails()==null?new ContactDetails():e.getContactDetails();contactMapper.apply(new ContactDetailsRequest(r.primaryContact(),r.secondaryContact()),c);e.setContactDetails(c);return mapper.toResponse(repo.save(e));}
+ public PersonResponse get(Long id){return mapper.toResponse(findEntity(id));} public void delete(Long id){repo.delete(findEntity(id));}
 }

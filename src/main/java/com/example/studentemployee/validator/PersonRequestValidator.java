@@ -1,18 +1,3 @@
 package com.example.studentemployee.validator;
-
-import com.example.studentemployee.dto.person.PersonCreateRequest;
-import com.example.studentemployee.enums.PersonType;
-import com.example.studentemployee.exception.ResourceNotFoundException;
-import org.springframework.stereotype.Component;
-
-@Component
-public class PersonRequestValidator {
-    public void validateCreate(PersonCreateRequest request) {
-        if (request.type() == PersonType.STUDENT && (request.course() == null || request.studentNumber() == null)) {
-            throw new IllegalArgumentException("Student requires studentNumber and course");
-        }
-        if (request.type() == PersonType.EMPLOYEE && (request.department() == null || request.employeeNumber() == null)) {
-            throw new IllegalArgumentException("Employee requires employeeNumber and department");
-        }
-    }
-}
+import com.example.studentemployee.dto.request.PersonRequest; import com.example.studentemployee.enums.PersonType; import com.example.studentemployee.exception.BadRequestException; import org.springframework.stereotype.Component;
+@Component public class PersonRequestValidator { public void validate(PersonRequest r){ if(r.type()==PersonType.EMPLOYEE && r.employeeCode()==null) throw new BadRequestException("employeeCode is required"); if(r.type()==PersonType.STUDENT && r.studentCode()==null) throw new BadRequestException("studentCode is required"); } }

@@ -1,7 +1,6 @@
 services:
   postgres:
-    image: postgres:17
-    container_name: student-employee-postgres
+    image: postgres:16
     environment:
       POSTGRES_DB: student_employee_db
       POSTGRES_USER: postgres
@@ -9,12 +8,6 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - student_employee_pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d student_employee_db"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
+      - student_employee_pg:/var/lib/postgresql/data
 volumes:
-  student_employee_pgdata:
+  student_employee_pg:

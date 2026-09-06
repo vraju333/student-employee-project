@@ -1,6 +1,2 @@
 package com.example.studentemployee.enums;
-
-public enum PersonType {
-    STUDENT,
-    EMPLOYEE
-}
+public enum PersonType { STUDENT, EMPLOYEE }

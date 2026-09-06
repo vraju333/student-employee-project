@@ -1,39 +1,16 @@
 package com.example.studentemployee.mapper;
 
-import com.example.studentemployee.dto.person.*;
+import com.example.studentemployee.dto.request.PersonRequest;
+import com.example.studentemployee.dto.response.PersonResponse;
 import com.example.studentemployee.entity.Employee;
 import com.example.studentemployee.enums.PersonType;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EmployeeMapper extends PersonMapper<Employee> {
-    public Employee toEntity(PersonCreateRequest request) {
-        Employee employee = new Employee();
-        mapCommonCreate(request, employee);
-        employee.setEmployeeNumber(request.employeeNumber());
-        employee.setDepartment(request.department());
-        employee.setDesignation(request.designation());
-        employee.setSalary(request.salary());
-        return employee;
-    }
-
-    public void updateEntity(PersonUpdateRequest request, Employee employee) {
-        mapCommonUpdate(request, employee);
-        employee.setEmployeeNumber(request.employeeNumber());
-        employee.setDepartment(request.department());
-        employee.setDesignation(request.designation());
-        employee.setSalary(request.salary());
-    }
-
-    public void patchEntity(PersonPatchRequest request, Employee employee) {
-        mapCommonPatch(request, employee);
-        if (request.department() != null) employee.setDepartment(request.department());
-        if (request.designation() != null) employee.setDesignation(request.designation());
-        if (request.salary() != null) employee.setSalary(request.salary());
-    }
-
-    public PersonResponse toResponse(Employee e) {
-        return new PersonResponse(e.getId(), PersonType.EMPLOYEE, e.getName(), e.getEmail(), e.getContact(), e.getAge(), e.getAddress(),
-                null, null, null, null, null, e.getEmployeeNumber(), e.getDepartment(), e.getDesignation(), e.getSalary());
-    }
+public class EmployeeMapper extends AbstractPersonMapper<Employee> {
+    public EmployeeMapper(EmailDetailsMapper e, ContactDetailsMapper c, AddressMapper a){super(e,c,a);}
+    public Employee toEntity(PersonRequest r){Employee e=new Employee();mapCommon(r,e);applyEmployee(r,e);return e;}
+    public void update(PersonRequest r,Employee e){mapCommon(r,e);applyEmployee(r,e);}
+    private void applyEmployee(PersonRequest r,Employee e){e.setEmployeeCode(r.employeeCode());e.setDepartment(r.department());e.setDesignation(r.designation());e.setSalary(r.salary());}
+    public PersonResponse toResponse(Employee e){return new PersonResponse(e.getId(),PersonType.EMPLOYEE,e.getFirstName(),e.getLastName(),emailMapper.toResponse(e.getEmailDetails()),contactMapper.toResponse(e.getContactDetails()),addressMapper.toResponse(e.getAddress()),e.getEmployeeCode(),e.getDepartment(),e.getDesignation(),e.getSalary(),null,null,null,null);}
 }
