@@ -7,7 +7,21 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class EmailDetailsMapper {
-    public EmailDetails toEntity(EmailDetailsRequest r){ if(r==null)return null; EmailDetails e=new EmailDetails(); apply(r,e); return e; }
-    public void apply(EmailDetailsRequest r, EmailDetails e){ if(r==null)return; e.setPrimaryEmail(r.primaryEmail()); e.setSecondaryEmail(r.secondaryEmail()); }
-    public EmailDetailsResponse toResponse(EmailDetails e){ return e==null?null:new EmailDetailsResponse(e.getPrimaryEmail(),e.getSecondaryEmail()); }
+    public EmailDetails toEntity(EmailDetailsRequest r) {
+        if (r == null) return null;
+        EmailDetails e = new EmailDetails();
+        apply(r, e);
+        return e;
+    }
+
+    public void apply(EmailDetailsRequest r, EmailDetails e) {
+        if (r == null) return;
+
+        e.setPrimaryEmail(r.primaryEmail());
+        e.setSecondaryEmail(r.secondaryEmail());
+    }
+
+    public EmailDetailsResponse toResponse(EmailDetails e) {
+        return e == null ? null : new EmailDetailsResponse(e.getPrimaryEmail(), e.getSecondaryEmail());
+    }
 }

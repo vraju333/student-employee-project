@@ -9,4 +9,5 @@ public class Employee extends BasePerson {
     public String getDepartment(){return department;} public void setDepartment(String v){department=v;}
     public String getDesignation(){return designation;} public void setDesignation(String v){designation=v;}
     public Double getSalary(){return salary;} public void setSalary(Double v){salary=v;}
+    public Integer age;
 }
