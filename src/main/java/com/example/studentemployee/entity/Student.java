@@ -6,8 +6,18 @@ import jakarta.persistence.Entity;
 public class Student extends BasePerson {
     private String studentCode;
     private String course;
+
+    public String getResidenceType() {
+        return residenceType;
+    }
+
+    public void setResidenceType(String residenceType) {
+        this.residenceType = residenceType;
+    }
+
     private Integer yearOfStudy;
     private Double gpa;
+    private String residenceType;
 
     public String getStudentCode() {
         return studentCode;
